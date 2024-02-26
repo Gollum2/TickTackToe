@@ -1,5 +1,7 @@
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        //dies ist die main hier kommen nur wichtige sachen rein die jeder lesen können sollte
+        //wenn hier was passiert dan nur mit kommentaren
+
     }
 }
