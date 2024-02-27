@@ -170,7 +170,7 @@ public class Spielfeld {
     }
 
     private void setUserInput(int[] input) {
-        spielfeld.get(input[0]).set(input[1], getCurrentSymbol());
+        spielfeld.get(input[0]).set(input[1], Character.valueOf(getCurrentSymbol()));
     }
 
     private boolean inputIsValid(int[] input) {
