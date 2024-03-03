@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    
+</head>
+
+<body>
+    <button type="button" onclick="druck()">"Three Rings for the Elven-kings under the sky,
+    Seven for the Dwarf-lords in their halls of stone,
+    Nine for Mortal Men doomed to die,
+    One for the Dark Lord on his dark throne
+    In the Land of Mordor where the Shadows lie.
+    One Ring to rule them all, One Ring to find them,
+    One Ring to bring them all and in the darkness bind them
+    In the Land of Mordor where the Shadows lie."</button>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <script>
+        function druck(){
+            console.log("Druck");
+            websocket = new WebSocket("ws://localhost:8888/test");
+            websocket.onopen = (event) => {
+                websocket.send("Smeagol");    
+            };
+            websocket.onmessage = function (event) {
+                console.log("Received message: ", event.data);
+                // You can process the message received from the server here
+            };
+
+            console.log("fertig");
+        }
+    </script>
+</body>
+
+</html>
