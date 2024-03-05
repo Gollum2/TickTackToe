@@ -1,12 +1,12 @@
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Spielfeld {
-    private ArrayList<ArrayList<Character>> spielfeld = new ArrayList<ArrayList<Character>>();
-
+    ArrayList<ArrayList<Character>> spielfeld = new ArrayList<ArrayList<Character>>();
+    Object flag=new Object();
+    int[] zahlen;
     char symbolP1 = 'X';
     char symbolP2 = 'O';
-    boolean player1Turn = true;
+    boolean player1Turn = false;
 
     Spielfeld() {
         for (int i = 0; i < 9; i++) {
@@ -61,11 +61,11 @@ public class Spielfeld {
 
     Spielfeld(char p1, char p2) {
         this();
-        if (p1 == '_') {
+        if (p1 == '_' || p1=='!') {
             System.out.println("NICHT ERLAUBT");
             return;
         }
-        if (p2 == '_') {
+        if (p2 == '_' || p2=='!') {
             System.out.println("NICHT ERLAUBT");
             return;
         }
@@ -73,25 +73,34 @@ public class Spielfeld {
         symbolP2 = p2;
     }
 
-    void game() {
+    void game() throws InterruptedException {
         int feld = -1;
         char erg;
+        System.out.println("game start");
         while (true) {
-            int[] temp = getUserInput(feld);
-            setUserInput(temp);
-            smallgamefinished(temp[0]);
-            if (spielfeld.get(temp[1]).get(9) == '_') {
-                feld = temp[1];
-            } else {
-                feld = -1;
+            int[] temp;
+            temp=getUserInput(feld);
+            if (!(temp[0]==-1 && temp[1]==-1)) {
+                setUserInput(temp);
+                //todo ich kann auf schon fertigen ticktaktoes spielen. unsere webseite sieth scheise aus
+                smallgamefinished(temp[0]);
+//            System.out.println(Arrays.deepToString(spielfeld.toArray()));
+                if (spielfeld.get(temp[1]).get(9) == '_') {
+                    feld = temp[1];
+                } else {
+                    feld = -1;
+                }
+                if ((erg = biggamechecking()) != '_') {
+                    System.out.println("WE HAVE A WINNER");
+                    System.out.println("player " + erg);
+                }
+                player1Turn = !player1Turn;
+                printfeld();
+                System.out.println("TURN: " + getCurrentSymbol());
             }
-            if((erg=biggamechecking())!='_'){
-                System.out.println("WE HAVE A WINNER");
-                System.out.println("player "+erg);
+            synchronized (flag){
+                flag.notify();
             }
-            player1Turn = !player1Turn;
-            printfeld();
-            System.out.println("TURN: "+getCurrentSymbol());
         }
     }
 
@@ -121,6 +130,16 @@ public class Spielfeld {
     }
 
     boolean smallgamefinished(int numerofsmalgame) {
+        boolean flag=false;
+        for (int i = 0; i < 9; i++) {
+            if(spielfeld.get(numerofsmalgame).get(i)=='_'){
+                flag=true;
+            }
+        }
+        if(flag==false){
+            spielfeld.get(numerofsmalgame).set(9,'!');
+            return true;
+        }
         boolean finished = false;
         for (int i = 0; i < 3; i++) {
             if (spielfeld.get(numerofsmalgame).get(i) == spielfeld.get(numerofsmalgame).get(i + 3)
@@ -147,25 +166,30 @@ public class Spielfeld {
             finished = true;
             spielfeld.get(numerofsmalgame).set(9, spielfeld.get(numerofsmalgame).get(4));
         }
-
         return finished;
     }
 
-    private int[] getUserInput(int feld) {
-        Scanner scanner = new Scanner(System.in);
+    private int[] getUserInput(int feld) throws InterruptedException {
         int[] inputs = new int[2];
-        do {
+        synchronized (this){
+            wait();
+        }
+        inputs=zahlen;
+//        do {
             if (feld == -1) {
                 System.out.println("Wähle dein großes Feld!");
-                inputs[0] = scanner.nextInt() - 1;
             } else {
                 System.out.println("DU MUSST AUF FELD " + (feld+1) + " Spielen");
-                inputs[0] = feld;
+                if(inputs[0]!=feld){
+                    return new int[]{-1,-1};
+                }
             }
             System.out.println("Wähle dein kleines Feld!");
-            inputs[1] = scanner.nextInt() - 1;
+//        }
+//        while (!inputIsValid(inputs));
+        if(!inputIsValid(inputs)){
+            return new int[]{-1,-1};
         }
-        while (!inputIsValid(inputs));
         return inputs;
     }
 
@@ -187,7 +211,6 @@ public class Spielfeld {
             System.out.println("Fertig");
             return false;
         }
-        System.out.println("return true");
         return true;
     }
 

@@ -6,11 +6,12 @@ import javax.websocket.server.ServerEndpoint;
 import java.net.InetSocketAddress;
 
 @ServerEndpoint("/test")
-public class MyWebSocketServer extends WebSocketServer{
+public class MyWebSocketServer extends WebSocketServer {
+    Spielfeld fedl;
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
-        System.out.println("onopen");
+
     }
 
     @Override
@@ -19,12 +20,28 @@ public class MyWebSocketServer extends WebSocketServer{
     }
 
     @Override
-    public void onMessage(WebSocket conn, String message) {
-        System.out.println("Received message from " + conn.getRemoteSocketAddress() + ": " + message);
+    public void onMessage(WebSocket conn, String input) {
+        System.out.println("Received message from " + conn.getRemoteSocketAddress() + ": " + input);
+        String[] a = input.split(" ");
+        int[] erg = new int[2];
+        erg[0] = Integer.parseInt(a[0])-1;
+        erg[1] = Integer.parseInt(a[1])-1;
+        fedl.zahlen = erg;
+        synchronized (fedl) {
+            fedl.notify();
+        }
         // You can process the message and send a response here
-        conn.send("You sent: " + message);
+//        conn.send(fedl.player1Turn+" "+ Arrays.deepToString(fedl.spielfeld.toArray()));
+        synchronized (fedl.flag){
+            try {
+                fedl.flag.wait();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        } //todo wenn spiel fertig irgendwie der webseite mitteilen
+        System.out.println("ich sende etwas");
+        conn.send(fedl.player1Turn?"1":"0");
     }
-
 
     @Override
     public void onError(WebSocket conn, Exception ex) {
@@ -34,14 +51,23 @@ public class MyWebSocketServer extends WebSocketServer{
     @Override
     public void onStart() {
         System.out.println("onstart");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    fedl.game();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+            }
+        }).start();
+
     }
-    MyWebSocketServer(int port){
+
+    MyWebSocketServer(int port, Spielfeld s) {
         super(new InetSocketAddress(port));
+        fedl = s;
     }
-    public static void main(String[] args) throws InterruptedException {
-        int port = 8888; // You can change the port number here
-        MyWebSocketServer server = new MyWebSocketServer(port);
-        server.start();
-        System.out.println("Server started on port: " + port);
-    }
+
 }

@@ -8,8 +8,11 @@ public class Main {
 //        Spielfeld spielfeld=new Spielfeld('o','x');
 //        spielfeld.printfeld();
 //        spielfeld.game();
-
-        MyWebSocketServer wss=new MyWebSocketServer(8888);
+        int port=8888;
+        Spielfeld feld=new Spielfeld('o','x');
+        MyWebSocketServer wss=new MyWebSocketServer(port,feld);
+        wss.start();
+        System.out.println("Server started on port: " + port);
         Scanner s=new Scanner(System.in);
         s.nextLine();
     }
