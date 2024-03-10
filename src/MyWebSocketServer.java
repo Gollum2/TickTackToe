@@ -11,7 +11,7 @@ public class MyWebSocketServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
-
+        System.out.println("onopen");
     }
 
     @Override

@@ -8,7 +8,7 @@
 </head>
 
 <body>
-<button type="button" onclick="druck()">"Three Rings for the Elven-kings under the sky,
+<button type="button">"Three Rings for the Elven-kings under the sky,
     Seven for the Dwarf-lords in their halls of stone,
     Nine for Mortal Men doomed to die,
     One for the Dark Lord on his dark throne
@@ -18,7 +18,6 @@
     In the Land of Mordor where the Shadows lie."</button>
 <div id="ramen"></div>
 <p id="ansage">..</p>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script>
     var ramen = document.getElementById("ramen");
     for (var l = 0; l < 3; l++) {
@@ -36,22 +35,12 @@
     }
     var spieler=false;
     var zug;
-    websocket = new WebSocket("ws://localhost:8888/test");
+    websocket = new WebSocket("ws://159.48.48.23:8888/test");
 
-    function druck() {
-        console.log("Druck");
-        websocket = new WebSocket("ws://localhost:8888/test");
-        websocket.onopen = (event) => {
-            websocket.send("Smeagol");
-            console.log("gesenddet");
-        };
-        websocket.onmessage = function (event) {
-            console.log("Received message: ", event.data);
-            // You can process the message received from the server here
-        };
+    websocket.addEventListener("open", function (event) {
+      console.log("abfuck");
+    });
 
-        console.log("fertig");
-    }
     websocket.onmessage = function (event) {
         console.log("Received message: ", event.data);
         if(parseInt(event.data)>1){
