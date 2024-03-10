@@ -38,9 +38,14 @@ public class MyWebSocketServer extends WebSocketServer {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-        } //todo wenn spiel fertig irgendwie der webseite mitteilen
+        }
         System.out.println("ich sende etwas");
-        conn.send(fedl.player1Turn?"1":"0");
+        if(fedl.winner!=0){
+            System.out.println("ich sende gewinner");
+            conn.send(Integer.toString(fedl.winner));
+        }else{
+            conn.send(fedl.player1Turn?"1":"0");
+        }
     }
 
     @Override

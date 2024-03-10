@@ -1,7 +1,9 @@
 import java.io.IOException;
 import java.util.Scanner;
 
-public class Main {
+public class
+
+Main {
     public static void main(String[] args) throws IOException {
         //dies ist die main hier kommen nur wichtige sachen rein die jeder lesen können sollte
         //wenn hier was passiert dan nur mit kommentaren

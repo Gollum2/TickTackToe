@@ -17,7 +17,7 @@
     One Ring to bring them all and in the darkness bind them
     In the Land of Mordor where the Shadows lie."</button>
 <div id="ramen"></div>
-<p>is egal was hier steht</p>
+<p id="ansage">..</p>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script>
     var ramen = document.getElementById("ramen");
@@ -54,12 +54,25 @@
     }
     websocket.onmessage = function (event) {
         console.log("Received message: ", event.data);
+        if(parseInt(event.data)>1){
+             var a=document.getElementById(zug);
+             a.innerHTML=spieler?"0":"x";
+             if(spieler){
+                console.log("player 2 won (0)");
+                document.getElementById("ansage").innerHTML="player 2 won (0)";
+             }else{
+                console.log("player 1 won (x)");
+                document.getElementById("ansage").innerHTML="player 1 won (x)";
+             }
+             console.log("we have a winner: player",event.data-2,spieler);
+        }else{
         if(event.data!=(spieler?1:0)){
             var a=document.getElementById(zug);
             a.innerHTML=spieler?"0":"x";
             spieler=!spieler;
         }
         console.log(spieler+" spieler");
+        }
         // You can process the message received from the server here
     };
     function input(a, b) {

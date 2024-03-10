@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Spielfeld {
     ArrayList<ArrayList<Character>> spielfeld = new ArrayList<ArrayList<Character>>();
@@ -7,6 +8,7 @@ public class Spielfeld {
     char symbolP1 = 'X';
     char symbolP2 = 'O';
     boolean player1Turn = false;
+    int winner=0;
 
     Spielfeld() {
         for (int i = 0; i < 9; i++) {
@@ -85,6 +87,8 @@ public class Spielfeld {
                 //todo ich kann auf schon fertigen ticktaktoes spielen. unsere webseite sieth scheise aus
                 smallgamefinished(temp[0]);
 //            System.out.println(Arrays.deepToString(spielfeld.toArray()));
+                System.out.println(temp[1]);
+                System.out.println(spielfeld.get(temp[1]));
                 if (spielfeld.get(temp[1]).get(9) == '_') {
                     feld = temp[1];
                 } else {
@@ -93,6 +97,11 @@ public class Spielfeld {
                 if ((erg = biggamechecking()) != '_') {
                     System.out.println("WE HAVE A WINNER");
                     System.out.println("player " + erg);
+                    winner=player1Turn?2:3;
+                    synchronized (flag){
+                        flag.notify();
+                    }
+                    break;
                 }
                 player1Turn = !player1Turn;
                 printfeld();
@@ -142,30 +151,31 @@ public class Spielfeld {
         }
         boolean finished = false;
         for (int i = 0; i < 3; i++) {
-            if (spielfeld.get(numerofsmalgame).get(i) == spielfeld.get(numerofsmalgame).get(i + 3)
+            if (spielfeld.get(numerofsmalgame).get(i)!='_'&&spielfeld.get(numerofsmalgame).get(i) == spielfeld.get(numerofsmalgame).get(i + 3)
                     && spielfeld.get(numerofsmalgame).get(i + 3) == spielfeld.get(numerofsmalgame).get(i + 6)) {
                 finished = true;
                 spielfeld.get(numerofsmalgame).set(9, spielfeld.get(numerofsmalgame).get(i));
             }
         }
         for (int i = 0; i < 3; i++) {
-            if (spielfeld.get(numerofsmalgame).get(i * 3) == spielfeld.get(numerofsmalgame).get(i * 3 + 1)
+            if (spielfeld.get(numerofsmalgame).get(i * 3)!='_'&&spielfeld.get(numerofsmalgame).get(i * 3) == spielfeld.get(numerofsmalgame).get(i * 3 + 1)
                     && spielfeld.get(numerofsmalgame).get(i * 3 + 1) == spielfeld.get(numerofsmalgame).get(i * 3 + 2)) {
                 finished = true;
                 spielfeld.get(numerofsmalgame).set(9, spielfeld.get(numerofsmalgame).get(i * 3));
             }
         }
         if (spielfeld.get(numerofsmalgame).get(0) == spielfeld.get(numerofsmalgame).get(4)
-                && spielfeld.get(numerofsmalgame).get(4) == spielfeld.get(numerofsmalgame).get(8)) {
+                && spielfeld.get(numerofsmalgame).get(4) == spielfeld.get(numerofsmalgame).get(8)&&spielfeld.get(numerofsmalgame).get(8)!='_') {
             finished = true;
             spielfeld.get(numerofsmalgame).set(9, spielfeld.get(numerofsmalgame).get(4));
 
         }
         if (spielfeld.get(numerofsmalgame).get(2) == spielfeld.get(numerofsmalgame).get(4)
-                && spielfeld.get(numerofsmalgame).get(4) == spielfeld.get(numerofsmalgame).get(6)) {
+                && spielfeld.get(numerofsmalgame).get(4) == spielfeld.get(numerofsmalgame).get(6) && spielfeld.get(numerofsmalgame).get(6)!='_') {
             finished = true;
             spielfeld.get(numerofsmalgame).set(9, spielfeld.get(numerofsmalgame).get(4));
         }
+        System.out.println("smallgamefinished "+finished);
         return finished;
     }
 
@@ -175,21 +185,31 @@ public class Spielfeld {
             wait();
         }
         inputs=zahlen;
-//        do {
+        System.out.println(Arrays.toString(inputs));
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                System.out.print(spielfeld.get(i*3+j).get(9)+" ");
+            }
+            System.out.println();
+        }
+        //        do {
             if (feld == -1) {
                 System.out.println("Wähle dein großes Feld!");
             } else {
                 System.out.println("DU MUSST AUF FELD " + (feld+1) + " Spielen");
-                if(inputs[0]!=feld){
+                if(inputs[0]!=feld ){
                     return new int[]{-1,-1};
                 }
             }
             System.out.println("Wähle dein kleines Feld!");
 //        }
 //        while (!inputIsValid(inputs));
+
         if(!inputIsValid(inputs)){
+            System.out.println("invalid input");
             return new int[]{-1,-1};
         }
+        smallgamefinished(inputs[0]);
         return inputs;
     }
 
@@ -206,9 +226,9 @@ public class Spielfeld {
             System.out.println("Besetzt");
             return false;
         }
-        if (getValue(new int[]{input[0], 9}) != '_') {
+        if (getValue(new int[]{input[0],9})!= '_') {
             printfeld();
-            System.out.println("Fertig");
+            System.out.println("feld bereits fertig");
             return false;
         }
         return true;
