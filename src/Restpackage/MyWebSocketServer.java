@@ -1,17 +1,24 @@
+package Restpackage;
+
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import javax.websocket.server.ServerEndpoint;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Random;
 
 @ServerEndpoint("/test")
 public class MyWebSocketServer extends WebSocketServer {
     Spielfeld fedl;
+    Random r=new Random();
+    HashMap<Integer,Spielfeld> connections=new HashMap<>();
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         System.out.println("onopen");
+        webSocket.send(Integer.toString(r.nextInt()%100000));
     }
 
     @Override
